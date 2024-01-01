@@ -16,15 +16,14 @@ class ImageEntry:
 	PYWAL_OPTIONS = []
 
 	@classmethod
-	def from_path(cls, path: Union[str, Path]):
-		path: Path = Path(path) if type(path) is str else path
+	def from_path(cls, given_path: Union[str, Path]):
+		path = Path(given_path)
 		if not path.is_file():
 			raise ValueError("Path must point to a file")
 		if path.suffix not in ImageEntry.ACCEPTED_SUFFIXES:
 			raise ValueError("Image must be a JPG or a PNG")
 
-		res_path = Path(path)
-		return cls(label=res_path.name, path=res_path)
+		return cls(label=path.name, path=path)
 
 	def pywal_switch(self):
 		wal_command = [
@@ -51,7 +50,7 @@ def find_all_entries() -> List[ImageEntry]:
 	DEFAUlt_PATH_STR = "~/Pictures/wallpapers/"
 	paths = [Path(DEFAUlt_PATH_STR).expanduser()]
 
-	CONFIG_PATH = Path("~/.config/gnome-pywal-switcher/config.txt").expanduser()
+	CONFIG_PATH = Path("~/.config/pywal-theme-switcher-widget/config.txt").expanduser()
 
 	if not CONFIG_PATH.exists():
 		if not CONFIG_PATH.parent.exists():
@@ -89,12 +88,15 @@ def availible_backends() -> Dict[str, bool]:
 def get_wal_path() -> Path:
 	base = Path(os.path.abspath(__file__)).parent
 	wal_path = base.parent.joinpath("venv/bin/wal")
-	assert wal_path.exists() and wal_path.is_file()
+	if not (wal_path.exists() and wal_path.is_file()):
+		sys_wal = shutil.which("wal")
+		if sys_wal is not None:
+			return sys_wal
+		print("E: Could not find wal in venv or in path. Did you run 'pip -r requirements.txt' in the venv?")
 	return wal_path
 
 
 WAL_PATH = str(get_wal_path())
-print(WAL_PATH)
 
 
 if __name__ == "__main__":
