@@ -1,0 +1,7 @@
+Pillow==10.1.0
+pycairo==1.25.1
+PyGObject==3.46.0
+pystray==0.19.5
+python-xlib==0.33
+pywal==3.3.0
+six==1.16.0
